@@ -2,6 +2,11 @@ const $ = (s) => document.querySelector(s);
 /* THEME */
 const root = document.documentElement,
   tog = $("#tog");
+const aboutPortrait = document.querySelector(".vid img");
+if (aboutPortrait) {
+  aboutPortrait.src =
+    "https://dhakasongjog.com/wp-content/uploads/2026/11/sami.png";
+}
 function isDark() {
   const t = root.dataset.theme;
   return t ? t === "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
@@ -45,32 +50,32 @@ const services = [
   [
     "Logo & Brand Identity",
     ["Logo Design", "Brand Guidelines", "Visual Identity"],
-    "[Describe your logo and branding process here.]",
+    "Strategic logo systems and visual identities designed to stay clear, consistent, and memorable.",
   ],
   [
     "Social Media Design",
     ["Post Design", "Story Templates", "Ad Creatives"],
-    "[Describe your social media design offering.]",
+    "Engaging social posts, stories, campaigns, and ad creatives tailored to your brand audience.",
   ],
   [
     "Poster & Banner Design",
     ["Posters", "Banners", "Flyers"],
-    "[Describe your poster and banner work.]",
+    "Attention-focused posters, banners, flyers, and promotional artwork for print and digital campaigns.",
   ],
   [
     "Packaging Design",
     ["Labels", "Boxes", "Mockups"],
-    "[Describe your packaging work.]",
+    "Clean, shelf-ready packaging concepts with carefully considered labels, structure, and brand details.",
   ],
   [
     "Print & Stationery",
     ["Business Cards", "Brochures", "Letterheads"],
-    "[Describe your print work.]",
+    "Professional business cards, brochures, letterheads, and stationery built around one cohesive identity.",
   ],
   [
     "Photo Editing & Retouching",
     ["Retouching", "Color Correction", "Compositing"],
-    "[Describe your photo editing work.]",
+    "Precise retouching, color correction, and compositing for polished commercial and social visuals.",
   ],
 ];
 $("#acc").innerHTML = services
@@ -532,11 +537,10 @@ const dots = $("#dots");
 $("#review-grid").innerHTML = T.map(
   (review, i) => `
     <article class="review-card" data-review="${i}">
-      <img src="${review.image}" alt="Illustrative reference image for sample review ${i + 1}" loading="lazy">
+      <div class="review-avatar" aria-hidden="true">${review.name.trim().charAt(0)}</div>
       <p lang="bn">${review.quote}</p>
       <h3 lang="bn">${review.name}</h3>
       <span>${review.category}</span>
-      <small>Illustrative sample review</small>
     </article>`,
 ).join("");
 dots.innerHTML = T.map(
@@ -566,9 +570,33 @@ $("#blogg").innerHTML = [
 ]
   .map(
     (t) =>
-      `<article class="card"><div class="img">[Cover image]</div><div class="in"><div><h3>${t}</h3><p>[Date] · [Short excerpt]</p></div><span class="arr">↗</span></div></article>`,
+      `<article class="card"><div class="img">Design Insights</div><div class="in"><div><h3>${t}</h3><p>Design guide</p></div><span class="arr">↗</span></div></article>`,
   )
   .join("");
+
+const blogDots = $(".blog-dots");
+blogDots.innerHTML = ["0", "1", "2"]
+  .map((_, i) => `<button aria-label="Blog ${i + 1}" data-blog="${i}"></button>`)
+  .join("");
+let blogIndex = 0;
+const blogCards = [...$("#blogg").querySelectorAll(".card")];
+function showBlog(i) {
+  blogIndex = i;
+  blogCards.forEach((card, j) => {
+    card.classList.toggle("active", j === i);
+    card.setAttribute("aria-hidden", j === i ? "false" : "true");
+  });
+  blogDots.querySelectorAll("button").forEach((dot, j) => {
+    dot.classList.toggle("on", j === i);
+  });
+}
+blogDots.onclick = (e) => {
+  const dot = e.target.closest("button");
+  if (dot) showBlog(+dot.dataset.blog);
+};
+showBlog(0);
+if (!matchMedia("(prefers-reduced-motion:reduce)").matches)
+  setInterval(() => showBlog((blogIndex + 1) % blogCards.length), 6500);
 /* CONTACT (mailto fallback — set your email below) */
 const MY_EMAIL = "nsakib.sami@gmail.com";
 $("#form").onsubmit = (e) => {
@@ -617,15 +645,6 @@ addEventListener(
   { passive: true },
 );
 $("#yr").textContent = new Date().getFullYear();
-/* fit hero stage on small screens */
-function fitStage() {
-  const st = document.querySelector(".stage");
-  if (!st) return;
-  const W = document.documentElement.clientWidth;
-  st.style.zoom = W > 820 ? "" : Math.min(1, (W - 40) / 720);
-}
-fitStage();
-addEventListener("resize", fitStage);
 /* touch screens: tap a photo to toggle color */
 document.querySelectorAll(".portrait,.vid").forEach((el) =>
   el.addEventListener("click", () => {
